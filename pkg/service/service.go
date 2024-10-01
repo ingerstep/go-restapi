@@ -7,6 +7,7 @@ import (
 
 type Authorization interface {
 	CreateUser(user gorestapi.User) (int, error)
+	GenerateToken(username, password string) (string, error)
 }
 
 type TodoList interface {

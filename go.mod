@@ -6,6 +6,8 @@ require github.com/gin-gonic/gin v1.10.0
 
 require github.com/sirupsen/logrus v1.9.3
 
+require github.com/dgrijalva/jwt-go v3.2.0+incompatible
+
 require (
 	github.com/bytedance/sonic v1.11.6 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
