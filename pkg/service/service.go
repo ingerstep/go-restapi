@@ -1,8 +1,12 @@
 package service
 
-import "github.com/ingerstep/go-restapi/pkg/repository"
+import (
+	gorestapi "github.com/ingerstep/go-restapi"
+	"github.com/ingerstep/go-restapi/pkg/repository"
+)
 
 type Authorization interface {
+	CreateUser(user gorestapi.User) (int, error)
 }
 
 type TodoList interface {
@@ -18,5 +22,7 @@ type Service struct {
 }
 
 func NewService(repos *repository.Repository) *Service {
-	return &Service{}
+	return &Service{
+		Authorization: NewAuthService(repos.Authorization),
+	}
 }

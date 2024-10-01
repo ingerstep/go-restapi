@@ -1,19 +1,20 @@
 package main
 
 import (
-	"log"
-
 	gorestapi "github.com/ingerstep/go-restapi"
 	"github.com/ingerstep/go-restapi/pkg/handler"
 	"github.com/ingerstep/go-restapi/pkg/repository"
 	"github.com/ingerstep/go-restapi/pkg/service"
 	_ "github.com/lib/pq"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
 func main() {
+	logrus.SetFormatter(new(logrus.JSONFormatter))
+
 	if err := initConfig(); err != nil {
-		log.Fatalf("error initializing configs: %s", err.Error())
+		logrus.Fatalf("error initializing configs: %s", err.Error())
 	}
 
 	db, err := repository.NewPostgresDB(repository.Config{
@@ -25,7 +26,7 @@ func main() {
 		SSLMode:  viper.GetString("SSL_MODE"),
 	})
 	if err != nil {
-		log.Fatalf("failed to initialize db: %s", err.Error())
+		logrus.Fatalf("failed to initialize db: %s", err.Error())
 	}
 
 	repos := repository.NewRepository(db)
@@ -33,14 +34,14 @@ func main() {
 	handlers := handler.NewHandler(services)
 
 	srv := new(gorestapi.Server)
-	if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
-		log.Fatalf("error occured while running http server: %s", err.Error())
+	if err := srv.Run(viper.GetString("SERVER_PORT"), handlers.InitRoutes()); err != nil {
+		logrus.Fatalf("error occured while running http server: %s", err.Error())
 	}
 }
 
 func initConfig() error {
 	viper.SetConfigType("env")
-	viper.SetConfigFile("../.env")
+	viper.SetConfigFile(".env")
 
 	if err := viper.ReadInConfig(); err != nil {
 		return err
