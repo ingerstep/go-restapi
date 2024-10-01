@@ -7,15 +7,28 @@ import (
 	"github.com/ingerstep/go-restapi/pkg/handler"
 	"github.com/ingerstep/go-restapi/pkg/repository"
 	"github.com/ingerstep/go-restapi/pkg/service"
+	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
 )
 
 func main() {
-	if err := initCongif(); err != nil {
+	if err := initConfig(); err != nil {
 		log.Fatalf("error initializing configs: %s", err.Error())
 	}
 
-	repos := repository.NewRepository()
+	db, err := repository.NewPostgresDB(repository.Config{
+		Host:     viper.GetString("POSTGRES_HOST"),
+		Port:     viper.GetString("POSTGRES_PORT"),
+		Username: viper.GetString("POSTGRES_USER"),
+		Password: viper.GetString("POSTGRES_PASSWORD"),
+		DBName:   viper.GetString("POSTGRES_DB"),
+		SSLMode:  viper.GetString("SSL_MODE"),
+	})
+	if err != nil {
+		log.Fatalf("failed to initialize db: %s", err.Error())
+	}
+
+	repos := repository.NewRepository(db)
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
 
@@ -25,8 +38,13 @@ func main() {
 	}
 }
 
-func initCongif() error {
-	viper.AddConfigPath("configs")
-	viper.SetConfigName("config")
-	return viper.ReadInConfig()
+func initConfig() error {
+	viper.SetConfigType("env")
+	viper.SetConfigFile("../.env")
+
+	if err := viper.ReadInConfig(); err != nil {
+		return err
+	}
+
+	return nil
 }
