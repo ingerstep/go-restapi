@@ -1,0 +1,38 @@
+services:
+  db:
+    image: postgres:14
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - gorestapi
+
+  server:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - gorestapidata:/usr/src/app
+    ports:
+      - "${SERVER_PORT}:3000"
+    env_file:
+      - ./.env
+    depends_on:
+      - db
+    networks:
+      - gorestapi
+
+networks:
+  gorestapi:
+    name: gorestapi
+    driver: bridge
+
+volumes:
+  pgdata:
+  gorestapidata:
