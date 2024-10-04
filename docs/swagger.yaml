@@ -59,7 +59,7 @@ definitions:
     - password
     - username
     type: object
-host: localhost:3005
+host: localhost:3000
 info:
   contact: {}
   description: API Server for TodoList Application

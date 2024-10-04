@@ -8,10 +8,11 @@ RUN go mod download && go mod verify
 RUN go install github.com/swaggo/swag/cmd/swag@latest
 
 COPY . .
-RUN go build -v -o /usr/local/bin/app ./cmd/main.go
 
 ENV PATH=$PATH:/usr/local/go/bin:/root/go/bin
 RUN swag init -g cmd/main.go
+
+RUN go build -v -o /usr/local/bin/app ./cmd/main.go
 
 CMD ["app"]
 

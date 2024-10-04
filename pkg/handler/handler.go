@@ -2,7 +2,10 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	docs "github.com/ingerstep/go-restapi/docs"
 	"github.com/ingerstep/go-restapi/pkg/service"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Handler struct {
@@ -15,6 +18,7 @@ func NewHandler(services *service.Service) *Handler {
 
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
+	docs.SwaggerInfo.BasePath = "/"
 
 	auth := router.Group("/auth")
 	{
@@ -46,5 +50,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			items.DELETE("/:id", h.deleteItem)
 		}
 	}
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	router.Run(":3000")
 	return router
 }
